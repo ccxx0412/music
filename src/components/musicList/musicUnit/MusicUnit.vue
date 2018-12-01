@@ -5,7 +5,7 @@
             <div class="musicUnit">
                 <!-- 单个 -->
                 <div class="mUnit" v-for="item in musicList" :key="item.id">
-                    <div class="mUnitImg">
+                    <div class="mUnitImg" @click="musicTap(item.id)">
                         <img class="mImg" :src="item.coverImgUrl" :alt="item.userId">
                         <span class="mAuthor" v-text="item.creator.nickname"></span>
                     </div>
@@ -30,23 +30,33 @@ export default {
         },
         More:Boolean
     },
-    methods:{
-        // 上拉加载更多
-        moreUnit(){
-            if(this.More){
-                this.$emit('moreUnit')
-            }
-        }
-    },
     mounted(){
         this.$nextTick(()=>{
             this.scroll=new BScroll(this.$refs.musicUnitWrapper,{
                 click:true,
                 pullUpLoad: true
             })
+            console.log(this.scroll)
             // 上拉加载更多
             this.scroll.on('pullingUp',this.moreUnit)
         })
+    },
+    methods:{
+        // 上拉加载更多
+        moreUnit(){
+            if(this.More){
+                this.$emit('moreUnit')
+            }
+        },
+        musicTap(m_id){
+            this.$emit('MusicUnitList',1,m_id)
+        }
+    },
+    watch:{
+        musicList(){
+            this.scroll.finishPullUp()
+            this.scroll.refresh()
+        }
     }
 
 }
@@ -54,6 +64,13 @@ export default {
 
 <style lang="less" scoped>
 .musicUnitWrapper{
+    // better-scroll必须加上定位
+    overflow: hidden;
+    position: absolute;
+    top: 23.3rem !important;
+    left: 0;
+    right: 0;
+    bottom: 0;
     .musicUnit{
         display: flex;
         justify-content: space-around;
